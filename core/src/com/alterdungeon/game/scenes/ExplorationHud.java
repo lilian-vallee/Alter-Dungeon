@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ExplorationHud {
 
-    Player player;
+    private final Exploration screen;
 
     public Stage stage;
     private Viewport viewport;
@@ -35,7 +35,7 @@ public class ExplorationHud {
     private int touchDirection = -1;
 
     public ExplorationHud(Exploration screen) {
-        this.player = screen.player;
+        this.screen = screen;
 
         viewport = new StretchViewport(AlterDungeonGame.V_WITDH, AlterDungeonGame.V_HEIGHT, new OrthographicCamera());
 
@@ -46,7 +46,9 @@ public class ExplorationHud {
     }
 
     public void update(){
-        player.move(touchDirection);
+        if(touchDirection != -1){
+            screen.player.movePlayer(touchDirection);
+        }
     }
 
     private void setMovingButton() {
@@ -59,7 +61,7 @@ public class ExplorationHud {
         moveUp.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("upButton");
-                touchDirection = 0;
+                touchDirection = 3;
                 return true;
             }
 
@@ -74,7 +76,13 @@ public class ExplorationHud {
         moveDown.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("downButton");
+                touchDirection = 0;
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                touchDirection = -1;
             }
         });
         //init du boutton deplacement droite
@@ -82,7 +90,13 @@ public class ExplorationHud {
         moveRight.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("rightButton");
+                touchDirection = 2;
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                touchDirection = -1;
             }
         });
         //init du boutton deplacement gauche
@@ -90,7 +104,13 @@ public class ExplorationHud {
         moveLeft.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("leftButton");
+                touchDirection = 1;
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                touchDirection = -1;
             }
         });
 

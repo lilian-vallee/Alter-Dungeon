@@ -23,9 +23,9 @@ public class Exploration implements Screen {
 
     public AlterDungeonGame game;
 
-    private ExplorationMap map;
+    public ExplorationMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
-    private OrthographicCamera camera;
+    public OrthographicCamera camera;
     private Viewport viewport;
     ExplorationHud hud;
 
@@ -40,11 +40,11 @@ public class Exploration implements Screen {
         viewport = new FitViewport(game.V_WITDH,game.V_HEIGHT,camera);
         hud = new ExplorationHud(this);
 
-        ExplorationMap map = new ExplorationMap();
+        map = new ExplorationMap();
         mapRenderer = new OrthogonalTiledMapRenderer(map);
 
-        player.setMap(map);
-        player.setPosition(player.getPosition().y, player.getPosition().x);
+        player.setScreenLevel(this);
+        camera.position.set(player.getPosition().y +16, player.getPosition().x +16, 0);
     }
 
     @Override
@@ -75,7 +75,6 @@ public class Exploration implements Screen {
     }
 
     private void update() {
-        camera.position.set(player.getPosition().x*32 +16, player.getPosition().y*32 +16, 0);
         camera.update();
         hud.update();
     }
@@ -101,8 +100,4 @@ public class Exploration implements Screen {
         map.dispose();
         mapRenderer.dispose();
     }
-
-
-
-
 }

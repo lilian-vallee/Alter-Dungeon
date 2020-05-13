@@ -48,6 +48,7 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * Initialise le squelette de la map sous forme de matrice.
+     *
      * @return protoMap
      */
     private void initMap(TextureRegion[][] splitTiles, MapLayers layers) {
@@ -58,8 +59,8 @@ public class ExplorationMap extends TiledMap {
         int[][] protoMap = new int[MAP_WIDTH][MAP_HEIGHT];
 
         //initialise toute la protmap a 1(=mur)
-        for (int x=0 ; x < MAP_WIDTH ; x++){
-            for (int y=0 ; y < MAP_WIDTH ; y++){
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            for (int y = 0; y < MAP_WIDTH; y++) {
                 protoMap[y][x] = 1;
             }
         }
@@ -80,22 +81,22 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise le background de la map
+     *
      * @param splitTiles
      * @return
      */
     private MapLayer initBackground(TextureRegion[][] splitTiles) {
         TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
 
-        for (int x = 0 ; x < backgroundLayer.getWidth() ; x++){
-            for (int y = 0 ; y < backgroundLayer.getHeight() ; y++){
+        for (int x = 0; x < backgroundLayer.getWidth(); x++) {
+            for (int y = 0; y < backgroundLayer.getHeight(); y++) {
 
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 
                 //33% de chance pour un tile alternatif
-                if ( (int) (Math.random()*9) == 0){
+                if ((int) (Math.random() * 9) == 0) {
                     cell.setTile(new StaticTiledMapTile(splitTiles[1][0]));
-                }
-                else{
+                } else {
                     cell.setTile(new StaticTiledMapTile(splitTiles[0][0]));
                 }
                 backgroundLayer.setCell(y, x, cell);
@@ -109,6 +110,7 @@ public class ExplorationMap extends TiledMap {
     /**
      * créé les différentes salles de la map et les couloirs qui les lies
      * initialise le layer entity qui est composé les différentes entitées interactifs
+     *
      * @param protoMap
      * @param layers
      * @return
@@ -122,24 +124,24 @@ public class ExplorationMap extends TiledMap {
 
         //stockage des salles créées
         ArrayList<Room> rooms = new ArrayList<>();
-        int nbRooms = SALLE_MIN + (int)(Math.random()*(SALLE_MAX - SALLE_MIN +1) );
+        int nbRooms = SALLE_MIN + (int) (Math.random() * (SALLE_MAX - SALLE_MIN + 1));
 
         //pour chaque salle de la map
-        for (int i=0 ; i<nbRooms ; i++){
+        for (int i = 0; i < nbRooms; i++) {
 
             //création des paramètres de la salle
-            int w = (int) ( TAILLE_MIN + Math.random()*(TAILLE_MAX - TAILLE_MIN +1) );//width
-            int h = (int) ( TAILLE_MIN + Math.random()*(TAILLE_MAX - TAILLE_MIN +1) );//height
-            int x = (int) ( Math.random()*(MAP_WIDTH -2 - w) +1);
-            int y = (int) ( Math.random()*(MAP_HEIGHT -2 - h) +1);
+            int w = (int) (TAILLE_MIN + Math.random() * (TAILLE_MAX - TAILLE_MIN + 1));//width
+            int h = (int) (TAILLE_MIN + Math.random() * (TAILLE_MAX - TAILLE_MIN + 1));//height
+            int x = (int) (Math.random() * (MAP_WIDTH - 2 - w) + 1);
+            int y = (int) (Math.random() * (MAP_HEIGHT - 2 - h) + 1);
 
-            Room newRoom = new Room(x,y,w,h);
+            Room newRoom = new Room(x, y, w, h);
 
             //On regarde si la nouvelle salle est superposé avec les autres
             boolean isSuperpose = false;
 
             for (Room r : rooms) {
-                if(newRoom.superposer(r)){
+                if (newRoom.superposer(r)) {
                     isSuperpose = true;
                     i--;//on reduit l'itération du for() pour recommencer l'itération
                     break;//Pas besoin de regarder les autres salles si l'une est deja superpose
@@ -147,20 +149,19 @@ public class ExplorationMap extends TiledMap {
             }
 
             //si isSuperpose est faux on continue le traitement de la salle
-            if (!isSuperpose){
+            if (!isSuperpose) {
 
                 //les cellules de la salle sont mis à 0
-                for (int tx = newRoom.x1 ; tx < newRoom.x2 ; tx++){
-                    for (int ty = newRoom.y1 ; ty < newRoom.y2 ; ty++){
-                        protoMap[ty][tx]=0;
+                for (int tx = newRoom.x1; tx < newRoom.x2; tx++) {
+                    for (int ty = newRoom.y1; ty < newRoom.y2; ty++) {
+                        protoMap[ty][tx] = 0;
                     }
                 }
 
                 //liaison de la nouvelle salle avec la précedente
-                if(rooms.size() > 0){
-                    protoMap = ajoutCouloir(protoMap, newRoom, rooms.get(rooms.size()-1));
-                }
-                else{
+                if (rooms.size() > 0) {
+                    protoMap = ajoutCouloir(protoMap, newRoom, rooms.get(rooms.size() - 1));
+                } else {
                     spawn = new Vector3(newRoom.centreX, newRoom.centreY, 0);
                     System.out.println(spawn);
                 }
@@ -176,6 +177,7 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise dans la derniere salle l'entitee de sortie de la map
+     *
      * @param room
      */
     private void initExit(Room room) {
@@ -184,6 +186,7 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise les entitees dans la salle
+     *
      * @param newRoom
      */
     private void initEntity(Room newRoom) {
@@ -192,6 +195,7 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise le spawn du joueur sur la map
+     *
      * @param newRoom
      */
     private void initSpawn(Room newRoom) {
@@ -199,7 +203,6 @@ public class ExplorationMap extends TiledMap {
     }
 
     /**
-     *
      * @param protoMap
      * @param newRoom
      * @param room
@@ -213,55 +216,50 @@ public class ExplorationMap extends TiledMap {
         int ty = newRoom.centreY;
 
         //50%
-        if ( (int)(Math.random()*2) == 1 ){
+        if ((int) (Math.random() * 2) == 1) {
 
             //mise a 0(=sol) de toute les cellules de l'axe x jusqu'a la coordonnée x de la salle a relier
-            while(tx != room.centreX){
+            while (tx != room.centreX) {
                 protoMap[ty][tx] = 0;
-                protoMap[ty+1][tx] = 0;
+                protoMap[ty + 1][tx] = 0;
 
-                if (newRoom.centreX < room.centreX){
+                if (newRoom.centreX < room.centreX) {
                     tx++;
-                }
-                else{
+                } else {
                     tx--;
                 }
             }
             //idem pour l'axe y
-            while(ty != room.centreY){
+            while (ty != room.centreY) {
                 protoMap[ty][tx] = 0;
-                protoMap[ty][tx+1] = 0;
+                protoMap[ty][tx + 1] = 0;
 
-                if (newRoom.centreY < room.centreY){
+                if (newRoom.centreY < room.centreY) {
                     ty++;
-                }
-                else{
+                } else {
                     ty--;
                 }
             }
-        }
-        else{
+        } else {
             //meme methode que precedement mais avec y en premier et x en deuxieme
-            while(ty != room.centreY){
+            while (ty != room.centreY) {
                 protoMap[ty][tx] = 0;
-                protoMap[ty][tx+1] = 0;
+                protoMap[ty][tx + 1] = 0;
 
-                if (newRoom.centreY < room.centreY){
+                if (newRoom.centreY < room.centreY) {
                     ty++;
-                }
-                else{
+                } else {
                     ty--;
                 }
             }
 
-            while(tx != room.centreX){
+            while (tx != room.centreX) {
                 protoMap[ty][tx] = 0;
-                protoMap[ty+1][tx] = 0;
+                protoMap[ty + 1][tx] = 0;
 
-                if (newRoom.centreX < room.centreX){
+                if (newRoom.centreX < room.centreX) {
                     tx++;
-                }
-                else{
+                } else {
                     tx--;
                 }
             }
@@ -273,6 +271,7 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise les murs de la map
+     *
      * @param protoMap
      * @param layers
      * @param splitTiles
@@ -284,21 +283,19 @@ public class ExplorationMap extends TiledMap {
         TiledMapTileLayer blockedWallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
 
         //pour tout les case de la map
-        for (int x = MAP_WIDTH-1 ; x >= 0 ; x--){
-            for (int y = 0 ; y < MAP_HEIGHT; y++){
+        for (int x = MAP_WIDTH - 1; x >= 0; x--) {
+            for (int y = 0; y < MAP_HEIGHT; y++) {
 
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 
-                if (protoMap[y][x] == 1){
+                if (protoMap[y][x] == 1) {
                     cell.setTile(new StaticTiledMapTile(splitTiles[0][2]));
                     blockedWallLayer.setCell(y, x, cell);
-                }
-                else if (protoMap[y][x] == 0 && protoMap[y][x+1] == 1){
+                } else if (protoMap[y][x] == 0 && protoMap[y][x + 1] == 1) {
                     //33% de chance pour un tile alternatif
-                    if ( (int)(Math.random()*6) == 2){
+                    if ((int) (Math.random() * 6) == 2) {
                         cell.setTile(new StaticTiledMapTile(splitTiles[1][1]));
-                    }
-                    else{
+                    } else {
                         cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
                     }
                     wallLayer.setCell(y, x, cell);
@@ -308,7 +305,7 @@ public class ExplorationMap extends TiledMap {
         layers.add(wallLayer);
         blockedWallLayer.getProperties().put("blocked", true);
         layers.add(blockedWallLayer);
-}
+    }
 
 
     /**
@@ -330,11 +327,11 @@ public class ExplorationMap extends TiledMap {
 
         /**
          * Constructeur
+         *
          * @param x
          * @param y
          * @param w
-         * @param h
-         * initialise le reste des attributs d'une salle
+         * @param h initialise le reste des attributs d'une salle
          */
         public Room(int x, int y, int w, int h) {
             x1 = x;
@@ -343,23 +340,18 @@ public class ExplorationMap extends TiledMap {
             y2 = y + h;
             this.w = w;
             this.h = h;
-            centreX = x1 + (w/2);
-            centreY = y1 + (h/2);
+            centreX = x1 + (w / 2);
+            centreY = y1 + (h / 2);
         }
 
         /**
          * Methode
+         *
          * @param room
-         * @return
-         * Verifie que la room n'est pas superposer avec la room entree en parametre.
+         * @return Verifie que la room n'est pas superposer avec la room entree en parametre.
          */
-        public boolean superposer(Room room){
+        public boolean superposer(Room room) {
             return (x1 <= room.x2 && x2 >= room.x1 && y1 <= room.y2 && y2 >= room.y1);
         }
-    }
-
-
-    public static void main(String[] args) {
-        ExplorationMap explorationMap = new ExplorationMap();
     }
 }
