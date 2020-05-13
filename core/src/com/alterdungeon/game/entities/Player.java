@@ -63,8 +63,12 @@ public class Player {
                 screen.camera.translate(0,3,0);
                 position.y += 3;
                 break;
+            default:
+                break;
         }
         updateMapPosition();
+        if(direction != -1)
+            animation.animate(direction);
     }
 
     private void updateMapPosition() {

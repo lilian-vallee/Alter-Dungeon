@@ -46,9 +46,7 @@ public class ExplorationHud {
     }
 
     public void update(){
-        if(touchDirection != -1){
-            screen.player.movePlayer(touchDirection);
-        }
+        screen.player.movePlayer(touchDirection);
     }
 
     private void setMovingButton() {
