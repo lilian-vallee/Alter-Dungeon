@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -49,6 +48,9 @@ public class ExplorationHud {
         screen.player.movePlayer(touchDirection);
     }
 
+    /**
+     * Implémentation des boutons de déplacement du joueur sur l'ecran de jeu
+     */
     private void setMovingButton() {
         //Bouton de deplacement
         movingTable = new Table();
@@ -58,7 +60,7 @@ public class ExplorationHud {
         moveUp = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("ui/direction/upButton.png"))));
         moveUp.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("upButton");
+                //System.out.println("upButton");
                 touchDirection = 3;
                 return true;
             }
@@ -73,7 +75,7 @@ public class ExplorationHud {
         moveDown = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("ui/direction/downButton.png"))));
         moveDown.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("downButton");
+                //System.out.println("downButton");
                 touchDirection = 0;
                 return true;
             }
@@ -87,7 +89,7 @@ public class ExplorationHud {
         moveRight = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("ui/direction/rightButton.png"))));
         moveRight.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("rightButton");
+                //System.out.println("rightButton");
                 touchDirection = 2;
                 return true;
             }
@@ -101,7 +103,7 @@ public class ExplorationHud {
         moveLeft = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("ui/direction/leftButton.png"))));
         moveLeft.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("leftButton");
+                //System.out.println("leftButton");
                 touchDirection = 1;
                 return true;
             }
@@ -120,6 +122,9 @@ public class ExplorationHud {
         stage.addActor(movingTable);
     }
 
+    /**
+     * Implementation du bouton memu sur l'écran de jeu.
+     */
     private void setMenuButton() {
         //bouton menu du joueur
         playerMenu = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("ui/playerMenu.png"))));//texture
@@ -128,7 +133,7 @@ public class ExplorationHud {
 
         playerMenu.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("bouton playerMenu");
+                //System.out.println("bouton playerMenu");
                 return true;
             }
         });

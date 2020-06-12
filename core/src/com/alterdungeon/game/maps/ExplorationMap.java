@@ -163,7 +163,7 @@ public class ExplorationMap extends TiledMap {
                     protoMap = ajoutCouloir(protoMap, newRoom, rooms.get(rooms.size() - 1));
                 } else {
                     spawn = new Vector3(newRoom.centreX, newRoom.centreY, 0);
-                    System.out.println(spawn);
+                    //System.out.println(spawn);
                 }
 
                 //initEntity(newRoom);

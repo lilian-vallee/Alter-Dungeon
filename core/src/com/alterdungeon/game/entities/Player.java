@@ -4,15 +4,13 @@ import com.alterdungeon.game.AlterDungeonGame;
 import com.alterdungeon.game.entities.animation.AnimationPlayer;
 import com.alterdungeon.game.maps.ExplorationMap;
 import com.alterdungeon.game.screen.Exploration;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 
 public class Player {
 
     AlterDungeonGame game;
-    AnimationPlayer animation;
-    TextureRegion texture;
+    public AnimationPlayer animation;
 
     Exploration screen;
     ExplorationMap map;
@@ -28,16 +26,28 @@ public class Player {
         position = new Vector3(x, y,0);
     }
 
+    public TextureRegion getAnimation(){
+        return animation.getAnimation();
+    }
+
+    /**
+     * Constructeur de la classe Joueur
+     * Sauvegarde non implémentée => Créé un nouveau joueur à chaque fois
+     * @param game
+     */
     public Player(AlterDungeonGame game) {
         this.game = game;
-        animation = new AnimationPlayer(new Texture("entities/playerSprite.png"));
-        this.texture = animation.getSprite(0,1);
+        animation = new AnimationPlayer(this);
     }
 
-    public void update() {
-        game.spriteBatch.draw(texture, game.V_WITDH/2 -16, game.V_HEIGHT/2 -16);
+    public void update(float delta) {
+        animation.update(delta);
     }
 
+    /**
+     * met à jour les attributs du joueur à l'arrivé sur une map
+     * @param screen
+     */
     public void setScreenLevel(Exploration screen) {
         this.screen = screen;
         this.map = screen.map;
@@ -45,7 +55,18 @@ public class Player {
         setPosition(screen.map.getSpawn().x*32, screen.map.getSpawn().y*32);
     }
 
+    /**
+     * Bouge le joueur en fonction de la direction
+     * @param direction
+     */
     public void movePlayer(int direction) {
+        /*
+        direction :
+        1 = up
+        2 = left
+        3 = right
+        4 = down
+         */
         switch (direction){
             case 0 :
                 screen.camera.translate(0,-3,0);
@@ -66,11 +87,19 @@ public class Player {
             default:
                 break;
         }
+        //mise à jour des coordonnée sur la map
         updateMapPosition();
+        //Animation de deplacement
         if(direction != -1)
-            animation.animate(direction);
+            animation.animateMove(direction);
+        else {
+            animation.animateStanding();
+        }
     }
 
+    /**
+     * Mise à jour des coordonnée du joueur sur la map
+     */
     private void updateMapPosition() {
         float tx = position.x;
         float ty = position.y;

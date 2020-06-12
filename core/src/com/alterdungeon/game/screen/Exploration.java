@@ -18,6 +18,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 /**
  * Exploration class
  * ecran de jeu pour la phase d'exploration.
+ *
+ * //disclamer Alert\\
+ * Le code qui vas suivre est considéré par le developpeur comme un véritable plat de bolognaise ... et il le regrette.
  */
 public class Exploration implements Screen {
 
@@ -54,7 +57,7 @@ public class Exploration implements Screen {
 
     @Override
     public void render(float delta) {
-        update();
+        update(delta);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -67,16 +70,17 @@ public class Exploration implements Screen {
         mapRenderer.render(background);
 
         game.spriteBatch.begin();
-        player.update();
+        game.spriteBatch.draw(player.getAnimation(), game.V_WITDH/2 -16, game.V_HEIGHT/2 -16);
         game.spriteBatch.end();
 
         mapRenderer.render(frontground);
         hud.stage.draw();
     }
 
-    private void update() {
+    private void update(float deltaTime) {
         camera.update();
         hud.update();
+        player.update(deltaTime);
     }
 
     @Override
