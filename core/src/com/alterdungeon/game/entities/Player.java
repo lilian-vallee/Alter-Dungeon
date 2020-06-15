@@ -2,6 +2,7 @@ package com.alterdungeon.game.entities;
 
 import com.alterdungeon.game.AlterDungeonGame;
 import com.alterdungeon.game.entities.animation.AnimationPlayer;
+import com.alterdungeon.game.entities.stats.PlayerStatistique;
 import com.alterdungeon.game.maps.ExplorationMap;
 import com.alterdungeon.game.screen.Exploration;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -9,21 +10,19 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Player {
 
+    private PlayerStatistique stat;
     AlterDungeonGame game;
     public AnimationPlayer animation;
 
     Exploration screen;
     ExplorationMap map;
 
+
     Vector3 mapPosition;
     Vector3 position;
 
     public Vector3 getPosition() {
         return position;
-    }
-
-    public void setPosition(float x, float y) {
-        position = new Vector3(x, y,0);
     }
 
     public TextureRegion getAnimation(){
@@ -38,6 +37,7 @@ public class Player {
     public Player(AlterDungeonGame game) {
         this.game = game;
         animation = new AnimationPlayer(this);
+        this.stat = new PlayerStatistique();
     }
 
     public void update(float delta) {
@@ -52,7 +52,7 @@ public class Player {
         this.screen = screen;
         this.map = screen.map;
         mapPosition = map.getSpawn();
-        setPosition(screen.map.getSpawn().x*32, screen.map.getSpawn().y*32);
+        position = new Vector3(mapPosition.x * 32, mapPosition.y *32, 0);
     }
 
     /**
@@ -60,27 +60,42 @@ public class Player {
      * @param direction
      */
     public void movePlayer(int direction) {
+        int[] newposition = {(int)position.x, (int)position.y};
         /*
         direction :
-        1 = up
-        2 = left
-        3 = right
-        4 = down
+        0 = down
+        1 = left
+        2 = right
+        3 = up
          */
         switch (direction){
             case 0 :
+                // test de collision avec une simulation du deplacement avec +32 pour up et right du a la taille de la texture du personnage
+                if (map.getCollision(newposition[0]/32, (newposition[1]-3)/32))
+                {
+                    break;
+                }
                 screen.camera.translate(0,-3,0);
                 position.y += -3;
                 break;
             case 1 :
+                if (map.getCollision((newposition[0]-3)/32, (newposition[1])/32)) {
+                    break;
+                }
                 screen.camera.translate(-3,0,0);
                 position.x += -3;
                 break;
             case 2 :
+                if (map.getCollision((newposition[0]+3+32)/32, (newposition[1])/32)) {
+                    break;
+                }
                 screen.camera.translate(3,0,0);
                 position.x += 3;
                 break;
             case 3 :
+                if (map.getCollision((newposition[0])/32, (newposition[1]+3+32)/32)) {
+                    break;
+                }
                 screen.camera.translate(0,3,0);
                 position.y += 3;
                 break;
@@ -105,5 +120,7 @@ public class Player {
         float ty = position.y;
         mapPosition.x = (int) tx/32;
         mapPosition.y = (int) ty/32;
+        //System.out.println(mapPosition);
+        //System.out.println(position);
     }
 }

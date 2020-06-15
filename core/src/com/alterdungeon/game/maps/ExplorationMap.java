@@ -37,12 +37,8 @@ public class ExplorationMap extends TiledMap {
         //partitionement des textures
         TextureRegion[][] splitTiles = TextureRegion.split(tiles, 32, 32);
 
-        //recuperation des Layers à la map
-        MapLayers layers = this.getLayers();
-
         //creation est initialisation de la map.
-        initMap(splitTiles, layers);
-
+        initMap(splitTiles);
     }
 
 
@@ -51,9 +47,9 @@ public class ExplorationMap extends TiledMap {
      *
      * @return protoMap
      */
-    private void initMap(TextureRegion[][] splitTiles, MapLayers layers) {
+    private void initMap(TextureRegion[][] splitTiles) {
 
-        layers.add(initBackground(splitTiles));
+        initBackground(splitTiles);
 
         //creation d'une protomap qui genere et sur le quelle la map sera calque
         int[][] protoMap = new int[MAP_WIDTH][MAP_HEIGHT];
@@ -66,9 +62,9 @@ public class ExplorationMap extends TiledMap {
         }
 
         //ajout des salles, couloir et les entitees qui les composes
-        protoMap = initRoom(protoMap, layers);
+        protoMap = initRoom(protoMap);
         //initialise le layer des murs
-        initWall(protoMap, layers, splitTiles);
+        initWall(protoMap, splitTiles);
 
 //        //affichage map console
 //        for (int x=0 ; x < MAP_WIDTH ; x++){
@@ -83,9 +79,8 @@ public class ExplorationMap extends TiledMap {
      * initialise le background de la map
      *
      * @param splitTiles
-     * @return
      */
-    private MapLayer initBackground(TextureRegion[][] splitTiles) {
+    private void initBackground(TextureRegion[][] splitTiles) {
         TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
 
         for (int x = 0; x < backgroundLayer.getWidth(); x++) {
@@ -103,7 +98,7 @@ public class ExplorationMap extends TiledMap {
             }
         }
         backgroundLayer.setName("background");
-        return backgroundLayer;
+        this.getLayers().add(backgroundLayer);
     }
 
 
@@ -112,10 +107,9 @@ public class ExplorationMap extends TiledMap {
      * initialise le layer entity qui est composé les différentes entitées interactifs
      *
      * @param protoMap
-     * @param layers
      * @return
      */
-    private int[][] initRoom(int[][] protoMap, MapLayers layers) {
+    private int[][] initRoom(int[][] protoMap) {
 
         int SALLE_MAX = 30;//nombre de salle max autorisé sur la map
         int SALLE_MIN = 15;//nombre de salle min autorisé sur la map
@@ -162,11 +156,12 @@ public class ExplorationMap extends TiledMap {
                 if (rooms.size() > 0) {
                     protoMap = ajoutCouloir(protoMap, newRoom, rooms.get(rooms.size() - 1));
                 } else {
-                    spawn = new Vector3(newRoom.centreX, newRoom.centreY, 0);
-                    //System.out.println(spawn);
+                    spawn = new Vector3(newRoom.centreY, newRoom.centreX, 0);
+                    System.out.println(spawn);
                 }
 
                 //initEntity(newRoom);
+
                 //ajout de la nouvelle salle de la liste avec les autres
                 rooms.add(newRoom);
             }
@@ -190,15 +185,6 @@ public class ExplorationMap extends TiledMap {
      * @param newRoom
      */
     private void initEntity(Room newRoom) {
-        //TODO
-    }
-
-    /**
-     * initialise le spawn du joueur sur la map
-     *
-     * @param newRoom
-     */
-    private void initSpawn(Room newRoom) {
         //TODO
     }
 
@@ -273,14 +259,13 @@ public class ExplorationMap extends TiledMap {
      * initialise les murs de la map
      *
      * @param protoMap
-     * @param layers
      * @param splitTiles
      */
-    private void initWall(int[][] protoMap, MapLayers layers, TextureRegion[][] splitTiles) {
+    private void initWall(int[][] protoMap, TextureRegion[][] splitTiles) {
 
         //creation des layers composant les murs
+        TiledMapTileLayer sideWallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
         TiledMapTileLayer wallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
-        TiledMapTileLayer blockedWallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
 
         //pour tout les case de la map
         for (int x = MAP_WIDTH - 1; x >= 0; x--) {
@@ -289,23 +274,42 @@ public class ExplorationMap extends TiledMap {
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
 
                 if (protoMap[y][x] == 1) {
+
                     cell.setTile(new StaticTiledMapTile(splitTiles[0][2]));
-                    blockedWallLayer.setCell(y, x, cell);
-                } else if (protoMap[y][x] == 0 && protoMap[y][x + 1] == 1) {
+                    cell.getTile().getProperties().put("blocked", null);
+                    wallLayer.setCell(y, x, cell);
+                }
+                else if (protoMap[y][x] == 0 && protoMap[y][x + 1] == 1) {
+
                     //33% de chance pour un tile alternatif
                     if ((int) (Math.random() * 6) == 2) {
                         cell.setTile(new StaticTiledMapTile(splitTiles[1][1]));
                     } else {
                         cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
                     }
-                    wallLayer.setCell(y, x, cell);
+                    cell.getTile().getProperties().put("blocked", null);
+                    sideWallLayer.setCell(y, x, cell);
                 }
             }
         }
-        layers.add(wallLayer);
-        blockedWallLayer.getProperties().put("blocked", true);
-        layers.add(blockedWallLayer);
+        this.getLayers().add(sideWallLayer);
+        wallLayer.setName("wall");
+        this.getLayers().add(wallLayer);
     }
+
+    public Boolean getCollision(int x , int y){
+        TiledMapTileLayer wallLayer = (TiledMapTileLayer) this.getLayers().get("wall");
+
+        try {
+            wallLayer.getCell(x, y).getTile().getProperties().containsKey("blocked");
+            //System.out.println("blocked");
+            return true;
+        }
+        catch (NullPointerException e){
+        }
+        return false;
+    }
+
 
 
     /**

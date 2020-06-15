@@ -47,7 +47,7 @@ public class Exploration implements Screen {
         mapRenderer = new OrthogonalTiledMapRenderer(map);
 
         player.setScreenLevel(this);
-        camera.position.set(player.getPosition().y +16, player.getPosition().x +16, 0);
+        camera.position.set(player.getPosition().x , player.getPosition().y, 0);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class Exploration implements Screen {
         mapRenderer.render(background);
 
         game.spriteBatch.begin();
-        game.spriteBatch.draw(player.getAnimation(), game.V_WITDH/2 -16, game.V_HEIGHT/2 -16);
+        game.spriteBatch.draw(player.getAnimation(), game.V_WITDH/2 , game.V_HEIGHT/2 );
         game.spriteBatch.end();
 
         mapRenderer.render(frontground);
