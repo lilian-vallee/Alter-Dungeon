@@ -7,6 +7,6 @@ public abstract class Stats {
     private int intelligence;
     private int resistance;
     private int dexterite;
-    private int
+    private int agilite;
 
 }

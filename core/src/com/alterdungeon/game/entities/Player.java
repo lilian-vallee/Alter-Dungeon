@@ -2,7 +2,7 @@ package com.alterdungeon.game.entities;
 
 import com.alterdungeon.game.AlterDungeonGame;
 import com.alterdungeon.game.entities.animation.AnimationPlayer;
-import com.alterdungeon.game.entities.stats.PlayerStatistique;
+import com.alterdungeon.game.entities.stats.PlayerStats;
 import com.alterdungeon.game.maps.ExplorationMap;
 import com.alterdungeon.game.screen.Exploration;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Player {
 
-    private PlayerStatistique stat;
+    private PlayerStats stat;
     AlterDungeonGame game;
     public AnimationPlayer animation;
 
@@ -37,7 +37,7 @@ public class Player {
     public Player(AlterDungeonGame game) {
         this.game = game;
         animation = new AnimationPlayer(this);
-        this.stat = new PlayerStatistique();
+        this.stat = new PlayerStats();
     }
 
     public void update(float delta) {
