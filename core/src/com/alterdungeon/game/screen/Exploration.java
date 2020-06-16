@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * ecran de jeu pour la phase d'exploration.
  *
  * //disclamer Alert\\
- * Le code qui vas suivre est considéré par le developpeur comme un véritable plat de bolognaise ... et il le regrette.
+ * Le code qui vas suivre est considéré par le developpeur comme un véritable plat de bolognaise (architecture spaghettie) ... et il le regrette.
  */
 public class Exploration implements Screen {
 
