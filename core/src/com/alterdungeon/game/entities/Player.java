@@ -17,6 +17,7 @@ public class Player {
     Exploration screen;
     ExplorationMap map;
 
+    private int SPEED = 3;
 
     Vector3 mapPosition;
     Vector3 position;
@@ -68,47 +69,67 @@ public class Player {
         2 = right
         3 = up
          */
-        switch (direction){
-            case 0 :
-                // test de collision avec une simulation du deplacement avec +32 pour up et right du a la taille de la texture du personnage
-                if (map.getCollision(newposition[0]/32, (newposition[1]-3)/32))
-                {
+        switch (direction) {
+            case 0:
+                // test de collision avec une simulation du deplacement depuis le coin en bas à gauche du pesonnage
+                if (map.getCollision(newposition[0] / 32, (newposition[1] - SPEED) / 32)) {
                     break;
                 }
-                screen.camera.translate(0,-3,0);
-                position.y += -3;
-                break;
-            case 1 :
-                if (map.getCollision((newposition[0]-3)/32, (newposition[1])/32)) {
+                //second test de collision avec une simulation du deplacement depuis le coin en haut à droit du pesonnage
+                if (map.getCollision(newposition[0] + 32 / 32, (newposition[1] - SPEED + 32) / 32)) {
                     break;
                 }
-                screen.camera.translate(-3,0,0);
-                position.x += -3;
+                screen.camera.translate(0, -SPEED, 0);
+                position.y += -SPEED;
                 break;
-            case 2 :
-                if (map.getCollision((newposition[0]+3+32)/32, (newposition[1])/32)) {
+
+            case 1:
+                if (map.getCollision((newposition[0] - SPEED) / 32, (newposition[1]) / 32)) {
                     break;
                 }
-                screen.camera.translate(3,0,0);
-                position.x += 3;
+                if (map.getCollision((newposition[0] - SPEED + 32) / 32, (newposition[1] + 32) / 32)) {
+                    break;
+                }
+                screen.camera.translate(-SPEED, 0, 0);
+                position.x += -SPEED;
                 break;
+
+            case 2:
+                if (map.getCollision((newposition[0] + SPEED) / 32, (newposition[1]) / 32)) {
+                    break;
+                }
+                if (map.getCollision((newposition[0] + SPEED + 32) / 32, (newposition[1] + 32) / 32)){
+                    break;
+                }
+                screen.camera.translate(SPEED,0,0);
+                position.x += SPEED;
+                break;
+
             case 3 :
-                if (map.getCollision((newposition[0])/32, (newposition[1]+3+32)/32)) {
+                if (map.getCollision((newposition[0])/32, (newposition[1]+SPEED)/32)) {
                     break;
                 }
-                screen.camera.translate(0,3,0);
-                position.y += 3;
+                if (map.getCollision((newposition[0]+32)/32, (newposition[1]+SPEED+32)/32)){
+                    break;
+                }
+                screen.camera.translate(0,SPEED,0);
+                position.y += SPEED;
                 break;
             default:
                 break;
         }
         //mise à jour des coordonnée sur la map
         updateMapPosition();
+
         //Animation de deplacement
         if(direction != -1)
             animation.animateMove(direction);
         else {
             animation.animateStanding();
+        }
+
+        if(map.getSortie(mapPosition.x, mapPosition.y)){
+            game.setScreen(new Exploration(game));
         }
     }
 

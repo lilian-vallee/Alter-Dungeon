@@ -19,8 +19,12 @@ public class ExplorationMap extends TiledMap {
     //Taille de la map
     int MAP_HEIGHT = 100;
     int MAP_WIDTH = 100;
+    int SPAWNLOOT = 3;
+
+    TextureRegion[][] mapTexture;
 
     private Vector3 spawn;
+    private Vector2 sortie;
 
     public Vector3 getSpawn() {
         return spawn;
@@ -35,10 +39,10 @@ public class ExplorationMap extends TiledMap {
         //chargement des textures de la map
         Texture tiles = new Texture(Gdx.files.internal("maps/tiles1To10.png"));
         //partitionement des textures
-        TextureRegion[][] splitTiles = TextureRegion.split(tiles, 32, 32);
+        this.mapTexture = TextureRegion.split(tiles, 32, 32);
 
         //creation est initialisation de la map.
-        initMap(splitTiles);
+        initMap();
     }
 
 
@@ -47,9 +51,7 @@ public class ExplorationMap extends TiledMap {
      *
      * @return protoMap
      */
-    private void initMap(TextureRegion[][] splitTiles) {
-
-        initBackground(splitTiles);
+    private void initMap() {
 
         //creation d'une protomap qui genere et sur le quelle la map sera calque
         int[][] protoMap = new int[MAP_WIDTH][MAP_HEIGHT];
@@ -61,10 +63,31 @@ public class ExplorationMap extends TiledMap {
             }
         }
 
+        TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+        backgroundLayer.setName("background");
+        this.getLayers().add(backgroundLayer);// id 0
+
+        //creation des layers composant les murs
+        TiledMapTileLayer sideWallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+        sideWallLayer.setName("sideWall");
+        this.getLayers().add(sideWallLayer);// id 1
+
+        //layer des objet present sur la map
+        TiledMapTileLayer objectLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+        objectLayer.setName("object");
+        this.getLayers().add(objectLayer);// id 2
+
+        TiledMapTileLayer wallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+        wallLayer.setName("wall");
+        this.getLayers().add(wallLayer);// id 3
+
+        initBackgroundTexture();
+
         //ajout des salles, couloir et les entitees qui les composes
         protoMap = initRoom(protoMap);
         //initialise le layer des murs
-        initWall(protoMap, splitTiles);
+        initWall(protoMap);
+
 
 //        //affichage map console
 //        for (int x=0 ; x < MAP_WIDTH ; x++){
@@ -77,11 +100,10 @@ public class ExplorationMap extends TiledMap {
 
     /**
      * initialise le background de la map
-     *
-     * @param splitTiles
      */
-    private void initBackground(TextureRegion[][] splitTiles) {
-        TiledMapTileLayer backgroundLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+    private void initBackgroundTexture() {
+
+        TiledMapTileLayer backgroundLayer = (TiledMapTileLayer) this.getLayers().get(0);
 
         for (int x = 0; x < backgroundLayer.getWidth(); x++) {
             for (int y = 0; y < backgroundLayer.getHeight(); y++) {
@@ -90,15 +112,13 @@ public class ExplorationMap extends TiledMap {
 
                 //33% de chance pour un tile alternatif
                 if ((int) (Math.random() * 9) == 0) {
-                    cell.setTile(new StaticTiledMapTile(splitTiles[1][0]));
+                    cell.setTile(new StaticTiledMapTile(mapTexture[1][0]));
                 } else {
-                    cell.setTile(new StaticTiledMapTile(splitTiles[0][0]));
+                    cell.setTile(new StaticTiledMapTile(mapTexture[0][0]));
                 }
                 backgroundLayer.setCell(y, x, cell);
             }
         }
-        backgroundLayer.setName("background");
-        this.getLayers().add(backgroundLayer);
     }
 
 
@@ -157,36 +177,19 @@ public class ExplorationMap extends TiledMap {
                     protoMap = ajoutCouloir(protoMap, newRoom, rooms.get(rooms.size() - 1));
                 } else {
                     spawn = new Vector3(newRoom.centreY, newRoom.centreX, 0);
-                    System.out.println(spawn);
+                    //System.out.println(spawn);
                 }
 
-                //initEntity(newRoom);
+                initEntity(newRoom);
 
                 //ajout de la nouvelle salle de la liste avec les autres
                 rooms.add(newRoom);
             }
-            //initExit(rooms.get(rooms.size()-1));
         }
+        initExit(rooms.get(rooms.size()-1));
         return protoMap;
     }
 
-    /**
-     * initialise dans la derniere salle l'entitee de sortie de la map
-     *
-     * @param room
-     */
-    private void initExit(Room room) {
-        //TODO
-    }
-
-    /**
-     * initialise les entitees dans la salle
-     *
-     * @param newRoom
-     */
-    private void initEntity(Room newRoom) {
-        //TODO
-    }
 
     /**
      * @param protoMap
@@ -254,18 +257,49 @@ public class ExplorationMap extends TiledMap {
         return protoMap;
     }
 
+    /**
+     * initialise dans la derniere salle l'entitee de sortie de la map
+     *
+     * @param room
+     */
+    private void initExit(Room room) {
+        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+        cell.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("maps/stair.png"))));
+
+        TiledMapTileLayer objectLayer = (TiledMapTileLayer) this.getLayers().get(2);
+        objectLayer.setCell(room.centreY, room.centreX, cell);
+
+        this.sortie = new Vector2(room.centreY, room.centreX);
+    }
+
+    /**
+     * initialise les entitees dans la salle
+     * @param room
+     */
+    private void initEntity(Room room) {
+        if ((int) (Math.random() * SPAWNLOOT) == 0) {
+            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+            cell.setTile(new StaticTiledMapTile(new TextureRegion(new Texture("maps/chest.png"))));
+
+            TiledMapTileLayer objectLayer = (TiledMapTileLayer) this.getLayers().get(2);
+
+            //choix aleatoire d'une coordonnée dans la salle
+            int x = (int) (Math.random()*room.w) + room.x1;
+            int y = (int) (Math.random()*room.h) + room.y1;
+
+            objectLayer.setCell(y, x, cell);
+        }
+    }
 
     /**
      * initialise les murs de la map
      *
      * @param protoMap
-     * @param splitTiles
      */
-    private void initWall(int[][] protoMap, TextureRegion[][] splitTiles) {
+    private void initWall(int[][] protoMap) {
 
-        //creation des layers composant les murs
-        TiledMapTileLayer sideWallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
-        TiledMapTileLayer wallLayer = new TiledMapTileLayer(MAP_WIDTH, MAP_HEIGHT, 32, 32);
+        TiledMapTileLayer wallLayer = (TiledMapTileLayer) this.getLayers().get(3);
+        TiledMapTileLayer sideWallLayer = (TiledMapTileLayer) this.getLayers().get(1);
 
         //pour tout les case de la map
         for (int x = MAP_WIDTH - 1; x >= 0; x--) {
@@ -275,7 +309,7 @@ public class ExplorationMap extends TiledMap {
 
                 if (protoMap[y][x] == 1) {
 
-                    cell.setTile(new StaticTiledMapTile(splitTiles[0][2]));
+                    cell.setTile(new StaticTiledMapTile(mapTexture[0][2]));
                     cell.getTile().getProperties().put("blocked", null);
                     wallLayer.setCell(y, x, cell);
                 }
@@ -283,18 +317,21 @@ public class ExplorationMap extends TiledMap {
 
                     //33% de chance pour un tile alternatif
                     if ((int) (Math.random() * 6) == 2) {
-                        cell.setTile(new StaticTiledMapTile(splitTiles[1][1]));
+                        cell.setTile(new StaticTiledMapTile(mapTexture[1][1]));
                     } else {
-                        cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
+                        cell.setTile(new StaticTiledMapTile(mapTexture[0][1]));
                     }
                     cell.getTile().getProperties().put("blocked", null);
                     sideWallLayer.setCell(y, x, cell);
                 }
             }
         }
-        this.getLayers().add(sideWallLayer);
-        wallLayer.setName("wall");
-        this.getLayers().add(wallLayer);
+    }
+
+    public Boolean getSortie(float x , float y){
+        if (sortie.equals(new Vector2(x,y)))
+            return true;
+        return false;
     }
 
     public Boolean getCollision(int x , int y){

@@ -64,8 +64,8 @@ public class Exploration implements Screen {
         game.spriteBatch.setProjectionMatrix(hud.stage.getCamera().combined);
         mapRenderer.setView(camera);
 
-        int[] background = {0,1};
-        int[] frontground = {2};
+        int[] background = {0,1,2};
+        int[] frontground = {3};
         //on fait un rendu du background puis du player puis le forground
         mapRenderer.render(background);
 
